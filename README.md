@@ -36,6 +36,11 @@ Place all the project files into a folder on your computer.
 ### Step 2: Create and Activate a Virtual Environment (Recommended)
 It is best practice to install dependencies inside a virtual environment to keep your global Python installation clean.
 
+First, navigate to the `terminal` directory:
+```bash
+cd terminal
+```
+
 **On macOS/Linux:**
 ```bash
 python3 -m venv venv
@@ -56,7 +61,7 @@ pip install -r requirements.txt
 
 ### Step 4: Configure Your Gemini API Key
 1. Get a free API Key from Google AI Studio at **[https://aistudio.google.com/](https://aistudio.google.com/)**.
-2. Open the `.env` file in the project directory.
+2. Open the `.env` file in the `terminal/` directory.
 3. Replace the placeholder value `your_gemini_api_key_here` with your actual API key:
    ```env
    GEMINI_API_KEY=AIzaSy...your_actual_key...
