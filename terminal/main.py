@@ -1,7 +1,7 @@
 import os
 import sys
-from google import genai
-from google.genai import errors
+import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Load environment variables from the .env file
@@ -9,21 +9,21 @@ load_dotenv()
 
 def verify_api_key():
     """
-    Checks if the GEMINI_API_KEY environment variable is set and valid.
-    Returns the key if valid, or exits the program with instructions if missing/placeholder.
+    Checks if the OPENAI_API_KEY environment variable is set.
+    Exits the program with instructions if missing/placeholder.
     """
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
     
-    # Check if the key is missing, empty, or still set to the default placeholder
-    if not api_key or api_key.strip() == "" or api_key == "your_gemini_api_key_here":
+    # Check if the key is missing, empty, or set to placeholder text
+    if not api_key or api_key.strip() == "" or "your_openai_api_key" in api_key:
         print("=" * 60)
-        print("ERROR: Gemini API Key is missing or not configured!")
+        print("ERROR: OpenAI API Key is missing or not configured!")
         print("=" * 60)
         print("Please follow these steps to set up your API Key:")
         print("1. Open the '.env' file in this directory.")
-        print("2. Replace 'your_gemini_api_key_here' with your actual API key.")
-        print("3. You can get a free API key from Google AI Studio:")
-        print("   https://aistudio.google.com/")
+        print("2. Replace the placeholder with your actual OpenAI API key.")
+        print("3. You can get an API key from the OpenAI Platform:")
+        print("   https://platform.openai.com/")
         print("=" * 60)
         sys.exit(1)
         
@@ -36,22 +36,22 @@ def main():
     print("Initializing chatbot client...")
     
     try:
-        # Initialize the official Google GenAI Client.
-        # It automatically detects and uses the GEMINI_API_KEY environment variable.
-        client = genai.Client()
+        # Initialize the OpenAI Client.
+        # It automatically detects and uses the OPENAI_API_KEY environment variable.
+        client = OpenAI()
         
-        # Start a multi-turn chat session.
-        # Using client.chats.create allows the model to remember conversation history.
-        # We use 'gemini-2.0-flash' as it is fast, powerful, and recommended for general text.
-        chat = client.chats.create(model="gemini-2.0-flash")
+        # Initialize conversation history with a system message
+        messages = [
+            {"role": "system", "content": "You are a helpful, friendly, and intelligent AI chatbot assistant."}
+        ]
         
     except Exception as e:
-        print(f"\nFailed to initialize the Gemini client: {e}")
+        print(f"\nFailed to initialize the OpenAI client: {e}")
         print("Please check your library installation and Python version.")
         sys.exit(1)
 
     print("\n" + "=" * 60)
-    print("       Welcome to the Gemini Python Chatbot!       ")
+    print("       Welcome to the OpenAI Python Chatbot!       ")
     print("=" * 60)
     print("Instructions:")
     print("- Type your question and press Enter to chat.")
@@ -73,24 +73,56 @@ def main():
             if not user_input:
                 continue
                 
-            print("Gemini: Thinking...", end="\r", flush=True)
+            print("Chatbot: Thinking...", end="\r", flush=True)
             
-            # Send the message to the chat session
-            response = chat.send_message(user_input)
+            # Append user message to the conversation history
+            messages.append({"role": "user", "content": user_input})
+            
+            # Request response from OpenAI Chat Completions API
+            # We use 'gpt-4o-mini' as the cost-efficient, fast, and powerful standard model
+            completion = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages
+            )
+            
+            # Extract response text
+            bot_response = completion.choices[0].message.content
+            
+            # Append assistant response to history to maintain context
+            messages.append({"role": "assistant", "content": bot_response})
             
             # Clear the 'Thinking...' text and print the response
-            print(" " * 20, end="\r", flush=True)
-            print(f"Gemini: {response.text}\n")
+            print(" " * 24, end="\r", flush=True)
+            print(f"Chatbot: {bot_response}\n")
             
-        except errors.APIError as api_err:
+        except openai.AuthenticationError:
             # Clear the 'Thinking...' text
-            print(" " * 20, end="\r", flush=True)
+            print(" " * 24, end="\r", flush=True)
             print("-" * 60)
-            print(f"Gemini API Error (Code {api_err.code}):")
-            print(f"{api_err.message}")
-            if api_err.code in [400, 403]:
-                print("\nTip: Please verify that your GEMINI_API_KEY in the .env file is correct.")
+            print("OpenAI Authentication Error:")
+            print("The provided API key is invalid or has expired.")
+            print("Please check the OPENAI_API_KEY in your .env file.")
             print("-" * 60 + "\n")
+            # Pop the failed user message from history to prevent corrupting context
+            messages.pop()
+            
+        except openai.RateLimitError:
+            print(" " * 24, end="\r", flush=True)
+            print("-" * 60)
+            print("OpenAI Rate Limit Error:")
+            print("You have exceeded your API rate limits or billing quota.")
+            print("Please check your billing and quota limits on the OpenAI Platform.")
+            print("-" * 60 + "\n")
+            messages.pop()
+            
+        except openai.APIConnectionError:
+            print(" " * 24, end="\r", flush=True)
+            print("-" * 60)
+            print("Connection Error:")
+            print("Could not connect to the OpenAI API servers.")
+            print("Please check your internet connection and try again.")
+            print("-" * 60 + "\n")
+            messages.pop()
             
         except KeyboardInterrupt:
             # Handle Ctrl+C gracefully
@@ -104,12 +136,13 @@ def main():
             
         except Exception as err:
             # Clear the 'Thinking...' text
-            print(" " * 20, end="\r", flush=True)
+            print(" " * 24, end="\r", flush=True)
             print("-" * 60)
             print("An unexpected error occurred.")
-            print("Please check your internet connection and try again.")
             print(f"Details: {err}")
             print("-" * 60 + "\n")
+            if messages:
+                messages.pop()
 
 if __name__ == "__main__":
     main()

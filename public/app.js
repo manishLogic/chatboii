@@ -1,13 +1,11 @@
-import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-
 // User-provided API Key from the previous configuration
 const DEFAULT_API_KEY = "";
 
 // State variables
-let apiKey = localStorage.getItem("GEMINI_API_KEY") || DEFAULT_API_KEY;
-let chatSession = null;
-let genAI = null;
-let model = null;
+let apiKey = localStorage.getItem("OPENAI_API_KEY") || DEFAULT_API_KEY;
+let messages = [
+    { role: "system", content: "You are a helpful, friendly, and intelligent AI chatbot assistant." }
+];
 
 // DOM Elements
 const chatMessages = document.getElementById("chat-messages");
@@ -22,28 +20,6 @@ const saveSettingsBtn = document.getElementById("save-settings-btn");
 const apiKeyInput = document.getElementById("api-key-input");
 const toggleKeyVisibility = document.getElementById("toggle-key-visibility");
 const suggestedButtons = document.querySelectorAll(".suggested-btn");
-
-// Initialize Gemini Client
-function initGemini() {
-    if (!apiKey || apiKey.trim() === "") {
-        showSystemMessage("API key is missing. Please click the settings cog to configure your Gemini API Key.", "info");
-        return false;
-    }
-    
-    try {
-        // Initialize SDK
-        genAI = new GoogleGenerativeAI(apiKey);
-        // Using the modern recommended gemini-2.0-flash model
-        model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        // Start multi-turn chat session
-        chatSession = model.startChat();
-        return true;
-    } catch (error) {
-        console.error("Gemini initialization failed:", error);
-        showSystemMessage("Failed to initialize Gemini API client. Please verify your API key.", "error");
-        return false;
-    }
-}
 
 // Show a system status banner in the chat window
 function showSystemMessage(text, type = "info") {
@@ -72,14 +48,14 @@ function appendMessage(sender, text) {
 
     const avatar = document.createElement("div");
     avatar.className = "message-avatar";
-    avatar.innerHTML = sender === "user" ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+    avatar.innerHTML = sender === "user" ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-brain"></i>';
 
     const wrapper = document.createElement("div");
     wrapper.className = "message-content-wrapper";
 
     const label = document.createElement("div");
     label.className = "message-sender";
-    label.innerText = sender === "user" ? "You" : "Gemini";
+    label.innerText = sender === "user" ? "You" : "Chatbot";
 
     const content = document.createElement("div");
     content.className = "message-text";
@@ -88,7 +64,7 @@ function appendMessage(sender, text) {
         // Simple plain text with HTML escaping to prevent injection
         content.innerText = text;
     } else {
-        // Parse markdown output from Gemini using marked.js
+        // Parse markdown output from OpenAI using marked.js
         try {
             content.innerHTML = marked.parse(text);
         } catch (e) {
@@ -113,14 +89,14 @@ function showTypingIndicator() {
     
     const avatar = document.createElement("div");
     avatar.className = "message-avatar";
-    avatar.innerHTML = '<i class="fa-solid fa-robot"></i>';
+    avatar.innerHTML = '<i class="fa-solid fa-brain"></i>';
 
     const wrapper = document.createElement("div");
     wrapper.className = "message-content-wrapper";
 
     const label = document.createElement("div");
     label.className = "message-sender";
-    label.innerText = "Gemini";
+    label.innerText = "Chatbot";
 
     const content = document.createElement("div");
     content.className = "message-text";
@@ -158,25 +134,50 @@ async function handleFormSubmit(e) {
     const text = userInput.value.trim();
     if (!text) return;
     
+    // Check if key is available
+    if (!apiKey || apiKey.trim() === "") {
+        showSystemMessage("OpenAI API key is missing. Please click the settings cog to configure your API Key.", "info");
+        return;
+    }
+    
     // Clear input field
     userInput.value = "";
     
     // Render user message bubble
     appendMessage("user", text);
     
-    // Verify client is initialized
-    if (!chatSession) {
-        const initialized = initGemini();
-        if (!initialized) return;
-    }
+    // Append to message history
+    messages.push({ role: "user", content: text });
     
     // Show typing/loading bubble
     showTypingIndicator();
     
     try {
-        // Send request to Gemini API
-        const response = await chatSession.sendMessage(text);
-        const aiText = response.text;
+        // Send request to OpenAI API
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: messages
+            })
+        });
+        
+        // Parse error response
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            const errMsg = (errData.error && errData.error.message) || `HTTP error! status: ${response.status}`;
+            throw new Error(errMsg, { cause: response.status });
+        }
+        
+        const data = await response.json();
+        const aiText = data.choices[0].message.content;
+        
+        // Append response to context history
+        messages.push({ role: "assistant", content: aiText });
         
         removeTypingIndicator();
         // Render bot response
@@ -185,17 +186,18 @@ async function handleFormSubmit(e) {
         console.error("API Call Failed:", error);
         removeTypingIndicator();
         
-        let errorMsg = "An error occurred while contacting the Gemini API. Please check your internet connection.";
+        // Pop the last user query from history since the turn failed
+        messages.pop();
         
-        if (error.message) {
-            const msgLower = error.message.toLowerCase();
-            if (msgLower.includes("quota") || msgLower.includes("429") || msgLower.includes("rate limit")) {
-                errorMsg = "<strong>Quota Exceeded (429)</strong>: You have exceeded the free tier rate limit or quota for this model. Please wait a minute or verify your plan settings in Google AI Studio.";
-            } else if (msgLower.includes("api key") || msgLower.includes("api_key") || msgLower.includes("invalid") || msgLower.includes("403") || msgLower.includes("400")) {
-                errorMsg = "<strong>Authentication Error</strong>: Your API key appears to be invalid or restricted. Click the settings cog at the top to check or update your key.";
-            } else {
-                errorMsg = `<strong>API Error</strong>: ${error.message}`;
-            }
+        let errorMsg = "An error occurred while contacting the OpenAI API. Please check your internet connection.";
+        const statusCode = error.cause;
+        
+        if (statusCode === 401) {
+            errorMsg = "<strong>Authentication Error (401)</strong>: Your OpenAI API key appears to be invalid. Click the settings cog at the top to check or update your key.";
+        } else if (statusCode === 429) {
+            errorMsg = "<strong>Quota Exceeded (429)</strong>: You have exceeded your rate limits or billing quota. Please verify your billing details on the OpenAI Platform.";
+        } else if (error.message) {
+            errorMsg = `<strong>API Error</strong>: ${error.message}`;
         }
         
         showSystemMessage(errorMsg, "error");
@@ -216,10 +218,12 @@ function saveSettings() {
     const newKey = apiKeyInput.value.trim();
     if (newKey !== apiKey) {
         apiKey = newKey;
-        localStorage.setItem("GEMINI_API_KEY", apiKey);
-        // Rebuild chat session with the new credentials
-        initGemini();
-        showSystemMessage("API key saved. Reinitialized Gemini session.", "info");
+        localStorage.setItem("OPENAI_API_KEY", apiKey);
+        showSystemMessage("API key saved. Reinitialized conversation session.", "info");
+        // Reset chat history session when switching API keys
+        messages = [
+            { role: "system", content: "You are a helpful, friendly, and intelligent AI chatbot assistant." }
+        ];
     }
     closeSettingsModal();
 }
@@ -233,7 +237,7 @@ function clearChat() {
                     <i class="fa-solid fa-sparkles"></i>
                 </div>
                 <h2>How can I help you today?</h2>
-                <p>Ask anything! This chatbot is powered by Google's advanced Gemini AI. Start by typing a prompt below.</p>
+                <p>Ask anything! This chatbot is powered by OpenAI's advanced GPT-4o-mini model. Start by typing a prompt below.</p>
                 <div class="suggested-prompts">
                     <button class="suggested-btn">Write a poem about space</button>
                     <button class="suggested-btn">Explain quantum computing in simple terms</button>
@@ -244,9 +248,9 @@ function clearChat() {
         // Rebind click handlers for dynamically re-created suggested buttons
         rebindSuggestedButtons();
         // Reset chat history session
-        if (genAI) {
-            chatSession = model.startChat();
-        }
+        messages = [
+            { role: "system", content: "You are a helpful, friendly, and intelligent AI chatbot assistant." }
+        ];
     }
 }
 
@@ -297,6 +301,3 @@ settingsModal.addEventListener("click", (e) => {
         closeSettingsModal();
     }
 });
-
-// Initialize on Load
-initGemini();

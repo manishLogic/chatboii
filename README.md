@@ -1,46 +1,45 @@
-# Basic Gemini Chatbot in Python
+# Basic OpenAI Chatbot in Python & Web Dashboard
 
-A beginner-friendly terminal-based chatbot application built using Python and the official unified **Google Gen AI SDK** (Gemini API). 
+A beginner-friendly terminal chatbot and a gorgeous Glassmorphism web application built using Python and OpenAI's API (`gpt-4o-mini`).
 
-This project demonstrates how to connect to Google's Gemini models, maintain conversational context (multi-turn chat history), load configurations from environment files (`.env`), and handle network/API errors gracefully.
+This project demonstrates how to connect to OpenAI's models, manage conversational state (multi-turn chat history), fetch responses client-side, and configure local settings securely.
 
 ---
 
 ## Features
 
-- **Multi-Turn Conversation**: Gemini remembers context and references previous parts of your conversation.
-- **Unified SDK**: Uses the latest, official `google-genai` Python library.
-- **Secure Configuration**: The API key is stored in a separate `.env` file instead of being hardcoded in the source code.
-- **Robust Error Handling**: Handles missing API keys, network/internet drops, and incorrect credentials cleanly without crashing.
-- **Interactive UI**: Simple, clean terminal formatting.
+- **Multi-Turn Chat**: Remembers context across inputs, allowing you to ask follow-up questions.
+- **Sleek Web Interface**: An elegant SPA featuring premium glassmorphism styling, animated background glow orbs, and clean markdown parser rendering.
+- **Secure Key Management**: Uses `.env` for the python CLI and local browser `localStorage` for the web dashboard.
+- **OpenAI Integration**: Configured to use the cost-efficient, ultra-fast `gpt-4o-mini` model.
 
 ---
 
 ## Project Structure
 
-- `main.py` – Core program containing the main interaction loop, initialization, and error handling.
-- `.env` – Local configuration file for storing your sensitive Google Gemini API Key.
-- `requirements.txt` – Package dependencies file.
-- `README.md` – Installation, setup, and usage documentation.
+- `terminal/main.py` – Terminal chatbot written in Python.
+- `terminal/requirements.txt` – Lists python packages (`openai` and `python-dotenv`).
+- `terminal/.env` – Terminal environment key configuration.
+- `public/index.html` – Structure of the web application.
+- `public/style.css` – Glassmorphism custom styling.
+- `public/app.js` – Browser chat logic connecting directly to OpenAI Chat Completions.
+- `vercel.json` – Vercel routing configuration.
+- `README.md` – Guide explaining how to run and deploy.
 
 ---
 
-## Setup & Installation
+## Running the Terminal Chatbot
 
 ### Prerequisites
 - Python 3.8 or higher installed on your computer.
 
-### Step 1: Clone or Copy the Repository
-Place all the project files into a folder on your computer.
-
-### Step 2: Create and Activate a Virtual Environment (Recommended)
-It is best practice to install dependencies inside a virtual environment to keep your global Python installation clean.
-
-First, navigate to the `terminal` directory:
+### Step 1: Open Terminal in Directory
+Navigate to the `terminal` subdirectory:
 ```bash
 cd terminal
 ```
 
+### Step 2: Set Up Virtual Environment
 **On macOS/Linux:**
 ```bash
 python3 -m venv venv
@@ -59,49 +58,29 @@ Install the required libraries listed in `requirements.txt`:
 pip install -r requirements.txt
 ```
 
-### Step 4: Configure Your Gemini API Key
-1. Get a free API Key from Google AI Studio at **[https://aistudio.google.com/](https://aistudio.google.com/)**.
-2. Open the `.env` file in the `terminal/` directory.
-3. Replace the placeholder value `your_gemini_api_key_here` with your actual API key:
+### Step 4: Configure Your OpenAI API Key
+1. Get an API Key from the [OpenAI Platform](https://platform.openai.com/api-keys).
+2. Open the `.env` file inside the `terminal/` directory.
+3. Replace the placeholder value with your actual API key:
    ```env
-   GEMINI_API_KEY=AIzaSy...your_actual_key...
+   OPENAI_API_KEY=sk-proj-...your_actual_key...
    ```
 
----
-
-## Running the Chatbot
-
-Start the chatbot by executing:
+### Step 5: Execute
+Run the chatbot:
 ```bash
 python main.py
 ```
 
-### Example Interaction
-
-```text
-Initializing chatbot client...
-
-============================================================
-       Welcome to the Gemini Python Chatbot!       
-============================================================
-Instructions:
-- Type your question and press Enter to chat.
-- Type 'exit' or 'quit' to end the conversation.
-============================================================
-
-You: Hello! My name is Alice.
-Gemini: Hello Alice! Nice to meet you. How can I help you today?
-
-You: What is my name?
-Gemini: Your name is Alice!
-
-You: exit
-
-Goodbye! Have a nice day.
-```
-
 ---
 
-## License
+## Running and Deploying the Web Dashboard (Vercel)
 
-This project is open-source and free to use.
+The web dashboard is fully ready for zero-configuration deployment to **Vercel**:
+
+1. Push your code repository to **GitHub**. (Ensure `.env` files are ignored so they don't leak).
+2. Go to your **[Vercel Dashboard](https://vercel.com)**.
+3. Click **Add New...** -> **Project** and import your GitHub repository.
+4. Leave settings at default. Vercel automatically reads `vercel.json` and routes everything correctly.
+5. Click **Deploy**.
+6. Open your live `.vercel.app` domain and enjoy!
