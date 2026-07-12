@@ -1,0 +1,25 @@
+# Local environment configurations (contains API keys)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Python environment
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+
+# Firebase/IDE temporary configurations
+.firebase/
+.firebaserc
+firebase-debug.log
+.idea/
+.vscode/

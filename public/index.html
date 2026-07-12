@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Chatbot</title>
+    
+    <!-- Modern Typography from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Premium UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Style Sheet (Glassmorphism & Rich Aesthetics) -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Markdown Parser (marked.js) for rich rendering of code blocks, bold text, etc. -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="glass-bg-container">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Main Chat Dashboard -->
+        <main class="chat-dashboard glass-panel">
+            <!-- Header Section -->
+            <header class="chat-header">
+                <div class="brand-info">
+                    <div class="logo-container">
+                        <i class="fa-solid fa-robot logo-icon"></i>
+                    </div>
+                    <div class="title-meta">
+                        <h1>Gemini Chat</h1>
+                        <p class="status-indicator"><span class="pulse-dot"></span>Online & Ready</p>
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <button id="settings-btn" class="icon-btn btn-hover-effect" title="API Settings">
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
+                    <button id="clear-chat-btn" class="icon-btn btn-hover-effect" title="Clear Chat">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Conversation Display Panel -->
+            <div id="chat-messages" class="chat-messages-container">
+                <!-- Welcome Message Card -->
+                <div class="welcome-card">
+                    <div class="welcome-icon">
+                        <i class="fa-solid fa-sparkles"></i>
+                    </div>
+                    <h2>How can I help you today?</h2>
+                    <p>Ask anything! This chatbot is powered by Google's advanced Gemini AI. Start by typing a prompt below.</p>
+                    <div class="suggested-prompts">
+                        <button class="suggested-btn">Write a poem about space</button>
+                        <button class="suggested-btn">Explain quantum computing in simple terms</button>
+                        <button class="suggested-btn">Help me debug a Python error</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input & Control Panel -->
+            <footer class="chat-footer">
+                <form id="chat-form" class="chat-form-container">
+                    <input 
+                        type="text" 
+                        id="user-input" 
+                        placeholder="Type a message or question..." 
+                        autocomplete="off" 
+                        required
+                    >
+                    <button type="submit" id="send-btn" class="send-btn btn-hover-effect">
+                        <span>Send</span>
+                        <i class="fa-solid fa-paper-plane send-icon"></i>
+                    </button>
+                </form>
+            </footer>
+        </main>
+    </div>
+
+    <!-- API Key Settings Modal -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-content glass-panel animated-modal">
+            <header class="modal-header">
+                <h2><i class="fa-solid fa-key header-key-icon"></i> API Credentials</h2>
+                <button id="close-modal-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </header>
+            <div class="modal-body">
+                <p class="modal-description">
+                    The chatbot communicates directly with the Google Gemini API from your browser. 
+                    Your credentials are stored securely in local browser memory and are never shared.
+                </p>
+                <div class="input-group">
+                    <label for="api-key-input">Gemini API Key</label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="api-key-input" 
+                            placeholder="Enter your GEMINI_API_KEY"
+                        >
+                        <button type="button" id="toggle-key-visibility" class="visibility-btn">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <small>
+                        Need an API key? Get one from the <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio <i class="fa-solid fa-up-right-from-square"></i></a>.
+                    </small>
+                </div>
+            </div>
+            <footer class="modal-footer">
+                <button id="cancel-settings-btn" class="btn btn-secondary">Cancel</button>
+                <button id="save-settings-btn" class="btn btn-primary">Save Changes</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Import Google GenAI JS SDK -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
