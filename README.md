@@ -1,8 +1,8 @@
-# Basic OpenAI Chatbot in Python & Web Dashboard
+# Basic Groq Chatbot in Python & Web Dashboard
 
-A beginner-friendly terminal chatbot and a gorgeous Glassmorphism web application built using Python and OpenAI's API (`gpt-4o-mini`).
+A beginner-friendly terminal chatbot and a gorgeous Glassmorphism web application built using Python and Groq's API (`llama-3.3-70b-versatile`).
 
-This project demonstrates how to connect to OpenAI's models, manage conversational state (multi-turn chat history), fetch responses client-side, and configure local settings securely.
+This project demonstrates how to connect to Groq's high-speed LPU inference engine, manage conversational state (multi-turn chat history), fetch responses client-side, and configure local settings securely.
 
 ---
 
@@ -11,7 +11,7 @@ This project demonstrates how to connect to OpenAI's models, manage conversation
 - **Multi-Turn Chat**: Remembers context across inputs, allowing you to ask follow-up questions.
 - **Sleek Web Interface**: An elegant SPA featuring premium glassmorphism styling, animated background glow orbs, and clean markdown parser rendering.
 - **Secure Key Management**: Uses `.env` for the python CLI and local browser `localStorage` for the web dashboard.
-- **OpenAI Integration**: Configured to use the cost-efficient, ultra-fast `gpt-4o-mini` model.
+- **Groq Integration**: Configured to use the flagship, ultra-fast `llama-3.3-70b-versatile` model.
 
 ---
 
@@ -22,7 +22,7 @@ This project demonstrates how to connect to OpenAI's models, manage conversation
 - `terminal/.env` – Terminal environment key configuration.
 - `public/index.html` – Structure of the web application.
 - `public/style.css` – Glassmorphism custom styling.
-- `public/app.js` – Browser chat logic connecting directly to OpenAI Chat Completions.
+- `public/app.js` – Browser chat logic connecting directly to Groq Chat Completions.
 - `vercel.json` – Vercel routing configuration.
 - `README.md` – Guide explaining how to run and deploy.
 
@@ -58,12 +58,12 @@ Install the required libraries listed in `requirements.txt`:
 pip install -r requirements.txt
 ```
 
-### Step 4: Configure Your OpenAI API Key
-1. Get an API Key from the [OpenAI Platform](https://platform.openai.com/api-keys).
+### Step 4: Configure Your Groq API Key
+1. Get an API Key from the [Groq Console](https://console.groq.com/keys).
 2. Open the `.env` file inside the `terminal/` directory.
 3. Replace the placeholder value with your actual API key:
    ```env
-   OPENAI_API_KEY=sk-proj-...your_actual_key...
+   GROQ_API_KEY=gsk_...your_actual_key...
    ```
 
 ### Step 5: Execute

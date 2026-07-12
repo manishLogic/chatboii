@@ -9,21 +9,21 @@ load_dotenv()
 
 def verify_api_key():
     """
-    Checks if the OPENAI_API_KEY environment variable is set.
+    Checks if the GROQ_API_KEY environment variable is set.
     Exits the program with instructions if missing/placeholder.
     """
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     
     # Check if the key is missing, empty, or set to placeholder text
-    if not api_key or api_key.strip() == "" or "your_openai_api_key" in api_key:
+    if not api_key or api_key.strip() == "" or "your_groq_api_key" in api_key:
         print("=" * 60)
-        print("ERROR: OpenAI API Key is missing or not configured!")
+        print("ERROR: Groq API Key is missing or not configured!")
         print("=" * 60)
         print("Please follow these steps to set up your API Key:")
         print("1. Open the '.env' file in this directory.")
-        print("2. Replace the placeholder with your actual OpenAI API key.")
-        print("3. You can get an API key from the OpenAI Platform:")
-        print("   https://platform.openai.com/")
+        print("2. Replace the placeholder with your actual Groq API key.")
+        print("3. You can get an API key from the Groq Console:")
+        print("   https://console.groq.com/")
         print("=" * 60)
         sys.exit(1)
         
@@ -36,9 +36,12 @@ def main():
     print("Initializing chatbot client...")
     
     try:
-        # Initialize the OpenAI Client.
-        # It automatically detects and uses the OPENAI_API_KEY environment variable.
-        client = OpenAI()
+        # Initialize the client pointing to Groq's API Base URL.
+        # It automatically detects and uses the GROQ_API_KEY environment variable for authorization.
+        client = OpenAI(
+            base_url="https://api.groq.com/openai/v1",
+            api_key=os.getenv("GROQ_API_KEY")
+        )
         
         # Initialize conversation history with a system message
         messages = [
@@ -46,12 +49,12 @@ def main():
         ]
         
     except Exception as e:
-        print(f"\nFailed to initialize the OpenAI client: {e}")
+        print(f"\nFailed to initialize the Groq client: {e}")
         print("Please check your library installation and Python version.")
         sys.exit(1)
 
     print("\n" + "=" * 60)
-    print("       Welcome to the OpenAI Python Chatbot!       ")
+    print("       Welcome to the Groq Python Chatbot!       ")
     print("=" * 60)
     print("Instructions:")
     print("- Type your question and press Enter to chat.")
@@ -78,10 +81,10 @@ def main():
             # Append user message to the conversation history
             messages.append({"role": "user", "content": user_input})
             
-            # Request response from OpenAI Chat Completions API
-            # We use 'gpt-4o-mini' as the cost-efficient, fast, and powerful standard model
+            # Request response from Groq Chat Completions API
+            # We use 'llama-3.3-70b-versatile' as the flagship powerful Llama 3 model
             completion = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="llama-3.3-70b-versatile",
                 messages=messages
             )
             
@@ -99,19 +102,18 @@ def main():
             # Clear the 'Thinking...' text
             print(" " * 24, end="\r", flush=True)
             print("-" * 60)
-            print("OpenAI Authentication Error:")
+            print("Groq Authentication Error:")
             print("The provided API key is invalid or has expired.")
-            print("Please check the OPENAI_API_KEY in your .env file.")
+            print("Please check the GROQ_API_KEY in your .env file.")
             print("-" * 60 + "\n")
-            # Pop the failed user message from history to prevent corrupting context
             messages.pop()
             
         except openai.RateLimitError:
             print(" " * 24, end="\r", flush=True)
             print("-" * 60)
-            print("OpenAI Rate Limit Error:")
+            print("Groq Rate Limit Error:")
             print("You have exceeded your API rate limits or billing quota.")
-            print("Please check your billing and quota limits on the OpenAI Platform.")
+            print("Please check your billing and quota limits on the Groq Console.")
             print("-" * 60 + "\n")
             messages.pop()
             
@@ -119,7 +121,7 @@ def main():
             print(" " * 24, end="\r", flush=True)
             print("-" * 60)
             print("Connection Error:")
-            print("Could not connect to the OpenAI API servers.")
+            print("Could not connect to the Groq API servers.")
             print("Please check your internet connection and try again.")
             print("-" * 60 + "\n")
             messages.pop()

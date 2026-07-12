@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenAI AI Chatbot</title>
+    <title>Groq AI Chatbot</title>
     
     <!-- Modern Typography from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,10 +32,10 @@
             <header class="chat-header">
                 <div class="brand-info">
                     <div class="logo-container">
-                        <i class="fa-solid fa-brain logo-icon"></i>
+                        <i class="fa-solid fa-bolt logo-icon"></i>
                     </div>
                     <div class="title-meta">
-                        <h1>OpenAI Chat</h1>
+                        <h1>Groq Chat</h1>
                         <p class="status-indicator"><span class="pulse-dot"></span>Online & Ready</p>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                         <i class="fa-solid fa-sparkles"></i>
                     </div>
                     <h2>How can I help you today?</h2>
-                    <p>Ask anything! This chatbot is powered by OpenAI's advanced GPT-4o-mini model. Start by typing a prompt below.</p>
+                    <p>Ask anything! This chatbot is powered by Groq's high-performance Llama-3.3-70b model. Start by typing a prompt below.</p>
                     <div class="suggested-prompts">
                         <button class="suggested-btn">Write a poem about space</button>
                         <button class="suggested-btn">Explain quantum computing in simple terms</button>
@@ -95,23 +95,23 @@
             </header>
             <div class="modal-body">
                 <p class="modal-description">
-                    The chatbot communicates directly with the OpenAI API from your browser. 
+                    The chatbot communicates directly with the Groq API from your browser. 
                     Your credentials are stored securely in local browser memory and are never shared.
                 </p>
                 <div class="input-group">
-                    <label for="api-key-input">OpenAI API Key</label>
+                    <label for="api-key-input">Groq API Key</label>
                     <div class="password-input-wrapper">
                         <input 
                             type="password" 
                             id="api-key-input" 
-                            placeholder="Enter your OPENAI_API_KEY"
+                            placeholder="Enter your GROQ_API_KEY"
                         >
                         <button type="button" id="toggle-key-visibility" class="visibility-btn">
                             <i class="fa-solid fa-eye"></i>
                         </button>
                     </div>
                     <small>
-                        Need an API key? Get one from the <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI Platform <i class="fa-solid fa-up-right-from-square"></i></a>.
+                        Need an API key? Get one from the <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Groq Console <i class="fa-solid fa-up-right-from-square"></i></a>.
                     </small>
                 </div>
             </div>
@@ -122,7 +122,7 @@
         </div>
     </div>
 
-    <!-- Import OpenAI JS logic -->
+    <!-- Import Groq JS logic -->
     <script type="module" src="app.js"></script>
 </body>
 </html>

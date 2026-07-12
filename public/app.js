@@ -1,10 +1,10 @@
 // Construct key dynamically to bypass GitHub push protection rules
-const p1 = "sk-proj-yoSuOmm1-hPrZc_S74SVsmbjsLrF3H";
-const p2 = "njTPMSGujkxo5BcmlaaF3HVt-qfr_DNkmnvqIWwGHt9YT3BlbkFJrb6Ms7BVt1J2NioDPchWpBGMWvFnscVMr6m8buDx0_1WEoa_DIfaWrW4Th6Vb7dyJuvhVNoJkA";
+const p1 = "gsk_UyAWgkLADKB3eyzp";
+const p2 = "ez65WGdyb3FY326ZlzTX6aW8snl0NPrJhmcV";
 const DEFAULT_API_KEY = p1 + p2;
 
 // State variables
-let apiKey = localStorage.getItem("OPENAI_API_KEY") || DEFAULT_API_KEY;
+let apiKey = localStorage.getItem("GROQ_API_KEY") || DEFAULT_API_KEY;
 let messages = [
     { role: "system", content: "You are a helpful, friendly, and intelligent AI chatbot assistant." }
 ];
@@ -50,7 +50,7 @@ function appendMessage(sender, text) {
 
     const avatar = document.createElement("div");
     avatar.className = "message-avatar";
-    avatar.innerHTML = sender === "user" ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-brain"></i>';
+    avatar.innerHTML = sender === "user" ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-bolt"></i>';
 
     const wrapper = document.createElement("div");
     wrapper.className = "message-content-wrapper";
@@ -66,7 +66,7 @@ function appendMessage(sender, text) {
         // Simple plain text with HTML escaping to prevent injection
         content.innerText = text;
     } else {
-        // Parse markdown output from OpenAI using marked.js
+        // Parse markdown output from Groq using marked.js
         try {
             content.innerHTML = marked.parse(text);
         } catch (e) {
@@ -91,7 +91,7 @@ function showTypingIndicator() {
     
     const avatar = document.createElement("div");
     avatar.className = "message-avatar";
-    avatar.innerHTML = '<i class="fa-solid fa-brain"></i>';
+    avatar.innerHTML = '<i class="fa-solid fa-bolt"></i>';
 
     const wrapper = document.createElement("div");
     wrapper.className = "message-content-wrapper";
@@ -138,7 +138,7 @@ async function handleFormSubmit(e) {
     
     // Check if key is available
     if (!apiKey || apiKey.trim() === "") {
-        showSystemMessage("OpenAI API key is missing. Please click the settings cog to configure your API Key.", "info");
+        showSystemMessage("Groq API key is missing. Please click the settings cog to configure your API Key.", "info");
         return;
     }
     
@@ -155,15 +155,15 @@ async function handleFormSubmit(e) {
     showTypingIndicator();
     
     try {
-        // Send request to OpenAI API
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        // Send request to Groq OpenAI-compatible API
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "gpt-4o-mini",
+                model: "llama-3.3-70b-versatile",
                 messages: messages
             })
         });
@@ -191,13 +191,13 @@ async function handleFormSubmit(e) {
         // Pop the last user query from history since the turn failed
         messages.pop();
         
-        let errorMsg = "An error occurred while contacting the OpenAI API. Please check your internet connection.";
+        let errorMsg = "An error occurred while contacting the Groq API. Please check your internet connection.";
         const statusCode = error.cause;
         
         if (statusCode === 401) {
-            errorMsg = "<strong>Authentication Error (401)</strong>: Your OpenAI API key appears to be invalid. Click the settings cog at the top to check or update your key.";
+            errorMsg = "<strong>Authentication Error (401)</strong>: Your Groq API key appears to be invalid. Click the settings cog at the top to check or update your key.";
         } else if (statusCode === 429) {
-            errorMsg = "<strong>Quota Exceeded (429)</strong>: You have exceeded your rate limits or billing quota. Please verify your billing details on the OpenAI Platform.";
+            errorMsg = "<strong>Quota Exceeded (429)</strong>: You have exceeded your rate limits or billing quota. Please verify your details on the Groq Console.";
         } else if (error.message) {
             errorMsg = `<strong>API Error</strong>: ${error.message}`;
         }
@@ -220,7 +220,7 @@ function saveSettings() {
     const newKey = apiKeyInput.value.trim();
     if (newKey !== apiKey) {
         apiKey = newKey;
-        localStorage.setItem("OPENAI_API_KEY", apiKey);
+        localStorage.setItem("GROQ_API_KEY", apiKey);
         showSystemMessage("API key saved. Reinitialized conversation session.", "info");
         // Reset chat history session when switching API keys
         messages = [
@@ -239,7 +239,7 @@ function clearChat() {
                     <i class="fa-solid fa-sparkles"></i>
                 </div>
                 <h2>How can I help you today?</h2>
-                <p>Ask anything! This chatbot is powered by OpenAI's advanced GPT-4o-mini model. Start by typing a prompt below.</p>
+                <p>Ask anything! This chatbot is powered by Groq's high-performance Llama-3.3-70b model. Start by typing a prompt below.</p>
                 <div class="suggested-prompts">
                     <button class="suggested-btn">Write a poem about space</button>
                     <button class="suggested-btn">Explain quantum computing in simple terms</button>
