@@ -1,0 +1,9 @@
+main.py
+requirements.txt
+.env
+venv/
+.git/
+.firebase/
+.firebaserc
+firebase.json
+firebase-debug.log
